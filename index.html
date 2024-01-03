@@ -47,20 +47,14 @@
         <div class="row">
             <div id="side_panel" class="col-md-3">
                 <div class="toggle-btn">
-                    <input type="checkbox" id="checkboxGunung" checked>
-                    <label for="checkboxGunung">Tampilkan Gunung</label>
                     <button id="toggleGunung" class="form-control btn-primary daftar">Daftar Gunung (Point)</button>
                     <div id="side_panel_gunung" style="display:none;"></div>
                 </div>
                 <div class="toggle-btn">
-                    <input type="checkbox" id="checkboxPolygon" checked>
-                    <label for="checkboxPolygon">Tampilkan Desa</label>
                     <button id="togglePolygon" class="form-control btn-secondary">Daftar Desa (Polygon)</button>
                     <div id="side_panel_polygon" style="display:none;"></div>
                 </div>
                 <div class="toggle-btn">
-                    <input type="checkbox" id="checkboxGaris" checked>
-                    <label for="checkboxGaris">Tampilkan Perbatasan</label>
                     <button id="toggleGaris" class="form-control btn-info">Daftar Perbatasan (Line)</button>
                     <div id="side_panel_garis" style="display:none;"></div>
                 </div>
@@ -85,6 +79,7 @@
             mymap.setView([-6.8380952, 107.9274764], 15);
         });
 
+        // Tambahkan GeoJSON Layer untuk point Gunung
         var pointLayerGunung = new L.GeoJSON.AJAX('data/gunung.geojson', {
             pointToLayer: function(feature, latlng) {
                 var str = "<button id='zoomTo1"+feature.properties.NAMOBJ.replace(/ /g, '') +
@@ -102,6 +97,7 @@
             }
         }).addTo(mymap);
 
+        // Tambahkan GeoJSON Layer untuk polygon
         var polygonLayer = new L.GeoJSON.AJAX('data/polygon.geojson', {
             onEachFeature: function (feature, layer) {
                 var str = "<button id='zoomToPolygon"+feature.properties.NAMOBJ.replace(/ /g, '') +
@@ -120,6 +116,7 @@
             }
         }).addTo(mymap);
 
+        // Tambahkan GeoJSON Layer untuk garis
         var garisLayer = new L.GeoJSON.AJAX('data/garis.geojson', {
             onEachFeature: function (feature, layer) {
                 var str = "<button id='zoomToGaris"+feature.properties.NAMOBJ.replace(/ /g, '') +
@@ -138,28 +135,35 @@
             }
         }).addTo(mymap);
 
+        // Tombol Toggle Daftar Gunung
         $("#toggleGunung").click(function(){
             toggleButton("#side_panel_gunung", "#togglePolygon, #toggleGaris");
         });
 
+        // Tombol Toggle Daftar Polygon
         $("#togglePolygon").click(function(){
             toggleButton("#side_panel_polygon", "#toggleGunung, #toggleGaris");
         });
 
+        // Tombol Toggle Daftar Garis
         $("#toggleGaris").click(function(){
             toggleButton("#side_panel_garis", "#toggleGunung, #togglePolygon");
         });
 
+        // Fungsi untuk menyembunyikan/menampilkan panel dan tombol toggle yang sesuai
         function toggleButton(panelId, toggleButtons) {
+            // Jika panel terlihat, sembunyikan dan tampilkan tombol toggle yang sesuai
             if ($(panelId).is(":visible")) {
                 $(panelId).hide();
                 $(toggleButtons).show();
             } else {
+                // Jika panel tidak terlihat, tampilkan dan sembunyikan tombol toggle yang sesuai
                 $(panelId).show();
                 $(toggleButtons).hide();
             }
         }
 
+        // Fungsi untuk menambahkan checkbox pada setiap tombol GeoJSON
         function addCheckbox(layer, panelId, checkboxId, labelText) {
             var checkbox = $("<input type='checkbox' id='" + checkboxId + "' checked>");
             var label = $("<label for='" + checkboxId + "'>" + labelText + "</label>");
@@ -176,6 +180,7 @@
             $(panelId).append(label);
         }
 
+        // Panggil fungsi addCheckbox untuk setiap layer GeoJSON
         addCheckbox(pointLayerGunung, "#side_panel_gunung", "checkboxGunung", "Tampilkan Gunung");
         addCheckbox(polygonLayer, "#side_panel_polygon", "checkboxPolygon", "Tampilkan Desa");
         addCheckbox(garisLayer, "#side_panel_garis", "checkboxGaris", "Tampilkan Perbatasan");
