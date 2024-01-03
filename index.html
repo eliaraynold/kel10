@@ -37,6 +37,14 @@
             margin-bottom: 10px;
             margin-top: 10px;
         }
+        .checkbox-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-label input {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -46,13 +54,30 @@
     <div class="container-fluid">
         <div class="row">
             <div id="side_panel" class="col-md-3">
+                <!-- Checkbox for Gunung -->
+                <div class="checkbox-label">
+                    <input type="checkbox" id="checkboxGunung" checked>
+                    <label for="checkboxGunung">Tampilkan Gunung</label>
+                </div>
                 <div class="toggle-btn">
                     <button id="toggleGunung" class="form-control btn-primary daftar">Daftar Gunung (Point)</button>
                     <div id="side_panel_gunung" style="display:none;"></div>
                 </div>
+
+                <!-- Checkbox for Polygon -->
+                <div class="checkbox-label">
+                    <input type="checkbox" id="checkboxPolygon" checked>
+                    <label for="checkboxPolygon">Tampilkan Desa</label>
+                </div>
                 <div class="toggle-btn">
                     <button id="togglePolygon" class="form-control btn-secondary">Daftar Desa (Polygon)</button>
                     <div id="side_panel_polygon" style="display:none;"></div>
+                </div>
+
+                <!-- Checkbox for Garis -->
+                <div class="checkbox-label">
+                    <input type="checkbox" id="checkboxGaris" checked>
+                    <label for="checkboxGaris">Tampilkan Perbatasan</label>
                 </div>
                 <div class="toggle-btn">
                     <button id="toggleGaris" class="form-control btn-info">Daftar Perbatasan (Line)</button>
@@ -71,13 +96,6 @@
         mymap.setView([-6.8380952, 107.9274764], 11);
         var backgroundLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
         mymap.addLayer(backgroundLayer);
-        var myMarker = L.marker([-6.8380952, 107.9274764]);
-        myMarker.addTo(mymap);
-        myMarker.bindPopup("<h5 class='text-center'>Kabupaten Sumedang</h5><hr><a href='https://id.wikipedia.org/wiki/Kabupaten_Sumedang' target='blank'><img src='img/logo.jpg'  width='150px'></a>");
-
-        $("#zoomToKabSumedang").click(function(){
-            mymap.setView([-6.8380952, 107.9274764], 15);
-        });
 
         // Tambahkan GeoJSON Layer untuk point Gunung
         var pointLayerGunung = new L.GeoJSON.AJAX('data/gunung.geojson', {
@@ -135,6 +153,36 @@
             }
         }).addTo(mymap);
 
+        // Checkbox and label functionality for Gunung
+        var checkboxGunung = $("#checkboxGunung");
+        checkboxGunung.change(function () {
+            if (checkboxGunung.prop('checked')) {
+                mymap.addLayer(pointLayerGunung);
+            } else {
+                mymap.removeLayer(pointLayerGunung);
+            }
+        });
+
+        // Checkbox and label functionality for Polygon
+        var checkboxPolygon = $("#checkboxPolygon");
+        checkboxPolygon.change(function () {
+            if (checkboxPolygon.prop('checked')) {
+                mymap.addLayer(polygonLayer);
+            } else {
+                mymap.removeLayer(polygonLayer);
+            }
+        });
+
+        // Checkbox and label functionality for Garis
+        var checkboxGaris = $("#checkboxGaris");
+        checkboxGaris.change(function () {
+            if (checkboxGaris.prop('checked')) {
+                mymap.addLayer(garisLayer);
+            } else {
+                mymap.removeLayer(garisLayer);
+            }
+        });
+
         // Tombol Toggle Daftar Gunung
         $("#toggleGunung").click(function(){
             toggleButton("#side_panel_gunung", "#togglePolygon, #toggleGaris");
@@ -162,29 +210,11 @@
                 $(toggleButtons).hide();
             }
         }
-
-        // Fungsi untuk menambahkan checkbox pada setiap tombol GeoJSON
-        function addCheckbox(layer, panelId, checkboxId, labelText) {
-            var checkbox = $("<input type='checkbox' id='" + checkboxId + "' checked>");
-            var label = $("<label for='" + checkboxId + "'>" + labelText + "</label>");
-
-            checkbox.change(function () {
-                if (checkbox.prop('checked')) {
-                    mymap.addLayer(layer);
-                } else {
-                    mymap.removeLayer(layer);
-                }
-            });
-
-            $(panelId).append(checkbox);
-            $(panelId).append(label);
+        function showCheckboxAndHideOthers(checkboxId) {
+            $("#checkboxGunung, #checkboxPolygon, #checkboxGaris").parent().hide();
+            $("#" + checkboxId).parent().show();
         }
-
-        // Panggil fungsi addCheckbox untuk setiap layer GeoJSON
-        addCheckbox(pointLayerGunung, "#side_panel_gunung", "checkboxGunung", "Tampilkan Gunug");
-        addCheckbox(polygonLayer, "#side_panel_polygon", "checkboxPolygon", "Tampilkan Desa");
-        addCheckbox(garisLayer, "#side_panel_garis", "checkboxGaris", "Tampilkan Perbatasan");
-
+        mymap.
         mymap.on('mousemove', function(e){
             var str = "Latitude: " + e.latlng.lat.toFixed(6) + " Longitude: " + e.latlng.lng.toFixed(6) + " Zoom Level: " + mymap.getZoom();
             $("#map_coords").html(str);
